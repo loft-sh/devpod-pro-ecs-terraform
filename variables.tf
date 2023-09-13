@@ -10,6 +10,10 @@ variable "az_count" {
   default = 2
 }
 
+variable "task_role_arn" {
+  default = ""
+}
+
 variable "domain" {
   default = "example.com"
 }
