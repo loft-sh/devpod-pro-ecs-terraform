@@ -28,7 +28,7 @@ resource "aws_iam_policy" "iam_policy" {
 
 # Create both Task and Execution roles
 resource "aws_iam_role" "task_exec_role" {
-  name = "${var.name_prefix}-iam-role"
+  name = "${var.name_prefix}-iam-exec-role"
 
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
@@ -45,7 +45,7 @@ resource "aws_iam_role" "task_exec_role" {
 }
 
 resource "aws_iam_role" "task_role" {
-  name = "${var.name_prefix}-iam-role"
+  name = "${var.name_prefix}-iam-task-role"
 
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
