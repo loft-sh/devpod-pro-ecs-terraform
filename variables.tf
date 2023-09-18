@@ -41,5 +41,5 @@ variable "balanced_container_name" {
 }
 
 variable "app_image" {
-  default = "ghcr.io/loft-sh/devpod-pro:3.3.0-alpha.21"
+  default = "ghcr.io/loft-sh/devpod-pro:3.3.0-alpha.22"
 }
