@@ -10,8 +10,8 @@ resource "random_password" "admin_password" {
 
 resource "aws_ecs_task_definition" "ecs_task" {
   family                   = "${var.name_prefix}-task"
-  task_role_arn            = var.task_role_arn
-  execution_role_arn       = aws_iam_role.iam_role.arn
+  task_role_arn            = aws_iam_role.task_role.arn
+  execution_role_arn       = aws_iam_role.task_exec_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu

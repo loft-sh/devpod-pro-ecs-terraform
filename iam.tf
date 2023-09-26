@@ -26,9 +26,48 @@ resource "aws_iam_policy" "iam_policy" {
   })
 }
 
-# Create an IAM role
-resource "aws_iam_role" "iam_role" {
-  name = "${var.name_prefix}-iam-role"
+resource "aws_iam_policy" "ssm_policy" {
+  name = "${var.name_prefix}-iam-ssm-policy"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssm:StartSession",
+          "ssm:DescribeSessions",
+          "ssm:GetConnectionStatus",
+          "ssm:DescribeInstanceProperties",
+          "ssm:TerminateSession",
+          "ssm:ResumeSession"
+        ],
+        "Resource": "*"
+      }
+    ]
+  })
+}
+
+# Create both Task and Execution roles
+resource "aws_iam_role" "task_exec_role" {
+  name = "${var.name_prefix}-iam-exec-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "ecs-tasks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "task_role" {
+  name = "${var.name_prefix}-iam-task-role"
 
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
@@ -48,5 +87,20 @@ resource "aws_iam_role" "iam_role" {
 resource "aws_iam_policy_attachment" "iam_role_policy_attachment" {
   name = "Policy Attachement"
   policy_arn = aws_iam_policy.iam_policy.arn
-  roles      = [aws_iam_role.iam_role.name]
+  roles      = [aws_iam_role.task_exec_role.name]
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_full_access" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "iam_read_only_access" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.ssm_policy.arn
 }
